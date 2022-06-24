@@ -89,18 +89,24 @@ export default {
       return store.getters["category/currentProduct"];
     });
 
+    const activeCategory = computed(() => {
+      return route.params.slug;
+    });
+
     //watch route
     watch(
       () => route.params.slug,
       () => {
         store.dispatch("category/getProductInCategory", route.params.slug);
-      }
+      },
+      activeCategory
     );
 
     return {
       store,
       route,
       products,
+      activeCategory,
     };
   },
 };

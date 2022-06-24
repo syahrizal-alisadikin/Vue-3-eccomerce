@@ -16,6 +16,7 @@
             font-weight-bold
             text-decoration-none text-dark
           "
+          :class="{ active: category.slug === $route.params.slug }"
         >
           <img :src="category.image" style="width: 35px" /> {{ category.name }}
         </router-link>
@@ -47,7 +48,6 @@ export default {
   setup() {
     //store vuex
     const store = useStore();
-
     //onMounted akan menjalankan action getCategories di module category, sebelum computed di atas dijalankan
     onMounted(() => {
       store.dispatch("category/getCategories");
