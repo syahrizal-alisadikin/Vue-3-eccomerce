@@ -21,7 +21,7 @@ export default {
 
   setup() {
     const router = useRouter();
-    const access_token = localStorage.getItem("access_token");
+    const access_token = localStorage.getItem("token");
 
     Api.defaults.headers.common["Authorization"] = "Bearer " + access_token;
     //get dat cart
@@ -42,22 +42,22 @@ export default {
         }
       });
 
-    // Api.get("/user")
-    //   .then((response) => {
-    //     console.log(response + "testing");
-    //     //commit mutation GET_CART
-    //   })
-    //   .catch((error) => {
-    //     if (error.response.data.message === "Unauthenticated.") {
-    //       localStorage.removeItem("token");
-    //       localStorage.removeItem("user");
-    //       if (access_token === null) {
-    //         return router.push({ name: "login" });
-    //       }
-    //     } else {
-    //       console.log(error.response.data.message);
-    //     }
-    //   });
+    Api.get("/user")
+      .then((response) => {
+        console.log(response + "testing");
+        //commit mutation GET_CART
+      })
+      .catch((error) => {
+        if (error.response.data.message === "Unauthenticated.") {
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+          if (access_token === null) {
+            return router.push({ name: "login" });
+          }
+        } else {
+          console.log(error.response.data.message);
+        }
+      });
   },
 };
 </script>
