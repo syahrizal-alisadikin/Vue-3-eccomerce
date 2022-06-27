@@ -29,7 +29,7 @@
         </div>
       </div>
 
-      <div class="row">
+      <div class="row" v-if="products.length > 0">
         <div
           v-for="product in products"
           :key="product.id"
@@ -81,6 +81,20 @@
           </div>
         </div>
       </div>
+
+      <div class="row" v-else>
+        <div
+          v-for="loader in sliders_product"
+          :key="loader"
+          class="col-md-3 col-6 mb-3"
+        >
+          <div class="card h-100 border-0 shadow rounded-md">
+            <div class="card-body">
+              <ContentLoader />
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -88,7 +102,9 @@
 <script>
 import Category from "@/components/Category"; // <-- component Category
 import Slider from "@/components/Slider"; // <-- component Slider
-import { computed, onMounted } from "vue";
+import { ContentLoader } from "vue-content-loader";
+
+import { computed, onMounted, ref } from "vue";
 import { useStore } from "vuex";
 export default {
   name: "HomeComponent",
@@ -96,6 +112,7 @@ export default {
   components: {
     Category, // <-- register component Category
     Slider, // <-- register component slider
+    ContentLoader,
   },
 
   setup() {
@@ -107,6 +124,8 @@ export default {
       store.dispatch("product/getProducts");
     });
 
+    const sliders_product = ref(4);
+
     //computed properti digunakan untuk get data products dari state di module product
     const products = computed(() => {
       return store.state.product.products;
@@ -115,6 +134,7 @@ export default {
     return {
       store,
       products,
+      sliders_product,
     };
   },
 };

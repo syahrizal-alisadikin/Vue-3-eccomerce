@@ -9,6 +9,9 @@ const product = {
     state: {
         //index products
         products: [],
+
+         //detail product
+         product: {}
     },
 
     //mutations
@@ -17,6 +20,11 @@ const product = {
          GET_PRODUCTS(state, products) {
             state.products = products
         },
+
+         //set state product dengan data dari response
+         DETAIL_PRODUCT(state, product) {
+            state.product = product
+        }
 
     },
 
@@ -39,6 +47,25 @@ const product = {
 
             })
         },
+
+         //action getDetailProducts
+         getDetailProduct({ commit }, slug) {
+
+            //get data sliders ke server
+            Api.get(`/product/${slug}`)
+            .then(response => {
+
+                //commit ke mutation GET_PRODUCTS dengan response data
+                commit('DETAIL_PRODUCT', response.data.product)
+
+            }).catch(error => {
+
+                //show error log dari response
+                console.log(error)
+
+            })
+        }
+
     },
 
     //getters

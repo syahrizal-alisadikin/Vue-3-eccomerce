@@ -1,6 +1,7 @@
 import { createApp } from 'vue'
 import App from './App.vue'
-
+import VueSweetalert2 from 'vue-sweetalert2';
+import 'sweetalert2/dist/sweetalert2.min.css';
 const app = createApp(App)
 //import router
 import router from './router'
@@ -12,6 +13,9 @@ app.use(router)
 //gunakan store di vue js dengan plugin "use"
 app.use(storeVuex)
 
+app.use(VueSweetalert2);
+//gunakan router di vue js dengan plugin "use"
+// app.use(Swal);
 
 //define mixins for global function
 app.mixin({

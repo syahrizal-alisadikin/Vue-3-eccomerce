@@ -67,7 +67,7 @@
 import { ref, reactive } from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
-
+import Swal from "sweetalert2";
 export default {
   name: "LoginComponent",
 
@@ -106,6 +106,11 @@ export default {
         .catch((error) => {
           //assign validaation message
           validation.value = error;
+          Swal.fire({
+            title: "OPPS",
+            text: "ada yang salah nih !!",
+            icon: "info",
+          });
         });
     }
 
