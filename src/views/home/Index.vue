@@ -54,7 +54,11 @@
                 class="card-title font-weight-bold"
                 style="font-size: 20px"
               >
-                {{ product.title }}
+                {{
+                  product.title.length > 15
+                    ? product.title.substring(0, 15) + "..."
+                    : product.title
+                }}
               </router-link>
 
               <div class="discount mt-2" style="color: #999">
