@@ -44,9 +44,7 @@
                   </tr>
                 </tbody>
                 <tbody v-else>
-                  <tr class="text-center">
-                    <td colspan="5" class="text-center">Tidak ada order</td>
-                  </tr>
+                  <ContentLoader />
                 </tbody>
               </table>
             </div>
@@ -60,8 +58,9 @@
 <script>
 //import customer menu component
 import CustomerMenu from "@/components/CustomerMenu";
-import { computed, onMounted } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useStore } from "vuex";
+import { ContentLoader } from "vue-content-loader";
 
 export default {
   name: "OrderIndexComponent",
@@ -69,6 +68,7 @@ export default {
   components: {
     //customer menu component
     CustomerMenu,
+    ContentLoader,
   },
 
   setup() {
@@ -81,6 +81,7 @@ export default {
       return store.dispatch("order/getOrder");
     });
 
+    const loaders_order = ref(1);
     //computed
     const orders = computed(() => {
       //panggil getter dengan nama "getOrder" di module "order" vuex
@@ -91,6 +92,7 @@ export default {
     return {
       store,
       orders,
+      loaders_order,
     };
   },
 };

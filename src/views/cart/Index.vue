@@ -95,7 +95,9 @@
                   </td>
                   <td class="set-td border-0 text-right">&nbsp; : Rp.</td>
                   <td class="set-td border-0 text-right">
-                    <p class="m-0" id="ongkir-cart">0</p>
+                    <p class="m-0" id="ongkir-cart">
+                      {{ moneyFormat(state.courier_cost) }}
+                    </p>
                   </td>
                 </tr>
                 <tr>
@@ -106,7 +108,9 @@
                   </td>
                   <td class="border-0 text-right">&nbsp; : Rp.</td>
                   <td class="border-0 text-right">
-                    <p class="font-weight-bold m-0 h5" align="right">0</p>
+                    <p class="font-weight-bold m-0 h5" align="right">
+                      {{ moneyFormat(state.grandTotal) }}
+                    </p>
                   </td>
                 </tr>
               </tbody>
@@ -317,9 +321,10 @@
 <script>
 import { onMounted, computed, reactive, ref } from "vue";
 import { useStore } from "vuex"; // <-- vuex
+import { useRouter } from "vue-router"; // vue router
 //import content loader
 import { ListLoader } from "vue-content-loader";
-
+import Api from "@/api/Api";
 export default {
   name: "CartComponent",
   components: {
@@ -329,6 +334,9 @@ export default {
   setup() {
     //store vuex
     const store = useStore();
+
+    //vue router
+    const router = useRouter();
     const loaders_cart = ref(1);
     //mounted cart
     onMounted(() => {
@@ -358,6 +366,8 @@ export default {
       store.dispatch("cart/removeCart", cart_id);
     }
 
+    //mounted data provinces
+
     //define state form
     const state = reactive({
       name: "", // <-- state name
@@ -385,6 +395,138 @@ export default {
       address: false, // <-- validation address
     });
 
+    const provinces = onMounted(() => {
+      Api.get("/rajaongkir/provinces")
+
+        .then((response) => {
+          state.provinces = response.data.data; // <-- assign state provinces dengan data hasil response
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    });
+
+    //fungsi mendapatkan data kota berdasarkan ID provinsi
+    function getCities() {
+      Api.get("/rajaongkir/cities", {
+        params: {
+          province_id: state.province_id, // ID provinsi
+        },
+      })
+        .then((response) => {
+          state.cities = response.data.data; // <-- assign state cities dengan data hasil response
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
+
+    //fungsi menampilkan pilihan courier
+    function getCourier() {
+      // set state courier menjadi true, untuk menampilkan pilihan kurir
+      state.courier = true;
+    }
+
+    //fungsi untuk mendapatkan biaya ongkos kirim
+    function getOngkir() {
+      //check berat produk
+      if (cartWeight.value == 0) {
+        alert("silahkan pilih produk terlebih dahulu!");
+        return;
+      }
+
+      Api.post("/rajaongkir/checkOngkir", {
+        city_destination: state.city_id, // <-- ID kota
+        weight: cartWeight.value, // berat produk
+        courier: state.courier_type, // jenis kurir
+      })
+        .then((response) => {
+          // set state cost menjadi true, untuk menampilkan pilihan cost pengiriman
+          state.cost = true;
+
+          //assign state costs dengan hasil response
+          state.costs = response.data.data[0].costs;
+          // console.log(response.data.data[0].costs);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
+
+    //fungsi untuk mengambil biaya ongkos kirim dan service kurir
+    function getCostService() {
+      //split value dengan menghapus string -> |
+      let shipping = state.costService.split("|");
+
+      //set state cost dan service
+      state.courier_cost = shipping[0];
+      state.courier_service = shipping[1];
+
+      //hitung grandrotal
+      const token = store.state.auth.token;
+
+      Api.defaults.headers.common["Authorization"] = "Bearer" + token;
+      Api.get("cart/total").then((response) => {
+        //jumlahkan total cart dan cost pengiriman
+        console.log(response.data);
+        state.grandTotal =
+          parseInt(response.data.total) + parseInt(state.courier_cost);
+      });
+
+      //show button checkout
+      state.buttonCheckout = true;
+    }
+
+    //method/function checkout
+    function checkout() {
+      //ceck apakah ada nama, phone, address dan berat produk ?
+      if (state.name && state.phone && state.address && cartWeight.value) {
+        //define variable
+        let data = {
+          name: state.name,
+          phone: state.phone,
+          province_id: state.province_id,
+          city_id: state.city_id,
+          courier_type: state.courier_type,
+          courier_service: state.courier_service,
+          courier_cost: state.courier_cost,
+          weight: cartWeight.value,
+          address: state.address,
+          grandTotal: state.grandTotal,
+        };
+
+        store
+          .dispatch("cart/checkout", data)
+          .then((response) => {
+            //jika berhasil, arahakan ke detail order dengan parameter snap_token midtrans
+            router.push({
+              name: "detail_order",
+              params: {
+                snap_token: response[0].snap_token,
+              },
+            });
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }
+
+      //check validasi name
+      if (!state.name) {
+        validation.name = true;
+      }
+
+      //check validasi phone
+      if (!state.phone) {
+        validation.phone = true;
+      }
+
+      //check validasi address
+      if (!state.address) {
+        validation.address = true;
+      }
+    }
+
     return {
       loaders_cart,
       carts, // <-- state carts
@@ -393,6 +535,12 @@ export default {
       removeCart, // <-- function removeCart
       state, // <-- state form
       validation,
+      provinces,
+      getCities,
+      getCourier,
+      getOngkir,
+      getCostService,
+      checkout,
     };
   },
 };

@@ -2,6 +2,10 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import VueSweetalert2 from 'vue-sweetalert2';
 import 'sweetalert2/dist/sweetalert2.min.css';
+
+// Datatables
+import Vue3EasyDataTable from 'vue3-easy-data-table';
+import 'vue3-easy-data-table/dist/style.css';
 const app = createApp(App)
 //import router
 import router from './router'
@@ -14,6 +18,7 @@ app.use(router)
 app.use(storeVuex)
 
 app.use(VueSweetalert2);
+app.use(Vue3EasyDataTable);
 //gunakan router di vue js dengan plugin "use"
 // app.use(Swal);
 

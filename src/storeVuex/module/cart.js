@@ -12,6 +12,9 @@ const cart = {
         cart: [],
         //total cart
         cartTotal: 0,
+
+        //cart weight
+        cartWeight: 0
     },
 
     //mutations
@@ -31,7 +34,12 @@ const cart = {
             state.cartWeight = weight
         },
 
-        
+        //clear all cart
+        CLEAR_CART(state) {
+        state.cart       = []
+        state.cartTotal  = 0
+        state.cartWeight = 0
+        }
 
 
     },
@@ -180,6 +188,50 @@ const cart = {
             })
 
         },
+
+         //checkout
+         checkout({ commit }, data) {
+
+            return new Promise((resolve, reject) => {
+
+                Api.post('/checkout', {
+                    
+                    courier:    data.courier_type,
+                    service:    data.courier_service,
+                    cost:       data.courier_cost,
+                    weight:     data.weight,
+                    name:       data.name,
+                    phone:      data.phone,
+                    province:   data.province_id,
+                    city:       data.city_id,
+                    address:    data.address,
+                    grand_total:data.grandTotal
+
+                })
+                .then(response => {
+
+                    resolve(response.data)
+
+                    //remove all Cart  on database
+                    Api.post('/cart/removeAll')
+                    .then(() => {
+
+                        //clear  cart
+                        commit('CLEAR_CART')
+
+                    })
+                    .catch(error => {
+                        console.log(error)
+                    })
+
+                })
+                .catch(error => {
+                    reject(error)
+                })
+
+            })
+
+        }
     },
 
     //getters

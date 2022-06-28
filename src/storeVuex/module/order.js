@@ -63,7 +63,7 @@ const order = {
             Api.defaults.headers.common['Authorization'] = "Bearer " +token
             Api.get(`order/${snap_token}`)
             .then(response => {
-                
+                console.log(response.data.data)
                 //commit mutation DETAIL_ORDER
                 commit('DETAIL_ORDER', response.data.data)
 
