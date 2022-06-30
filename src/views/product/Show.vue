@@ -102,7 +102,7 @@
               <div
                 v-for="product in productAll"
                 :key="product.id"
-                class="col-md-3 col-6 mb-3"
+                class="col-md-3 col-12 mb-3"
               >
                 <div class="card h-100 border-0 shadow rounded-md">
                   <div class="card-img">
